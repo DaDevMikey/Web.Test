@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>web.test - Code Tester</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>web.test - Code Tester</h1>
+    <button id="theme-toggle">Toggle Dark/Light</button>
+    <button id="fullscreen-toggle">Fullscreen Preview</button>
+  </header>
+
+  <main>
+    <aside id="settings">
+      <h2>Settings</h2>
+      <label><input type="checkbox" id="live-update" checked> Live Update</label>
+      <label><input type="checkbox" id="show-css" checked> Show CSS Editor</label>
+      <label><input type="checkbox" id="show-js" checked> Show JS Editor</label>
+      <button id="beautify-code">Beautify Code</button>
+      <button id="minify-code">Minify Code</button>
+    </aside>
+
+    <section id="editor">
+      <div class="editor-section" id="html-editor">
+        <label for="html-code">HTML</label>
+        <textarea id="html-code" spellcheck="false"></textarea>
+      </div>
+      <div class="editor-section" id="css-editor">
+        <label for="css-code">CSS</label>
+        <textarea id="css-code" spellcheck="false"></textarea>
+      </div>
+      <div class="editor-section" id="js-editor">
+        <label for="js-code">JavaScript</label>
+        <textarea id="js-code" spellcheck="false"></textarea>
+      </div>
+    </section>
+
+    <section id="preview">
+      <iframe id="output"></iframe>
+    </section>
+  </main>
+
+  <footer>
+    <p>This site lets you test HTML, CSS, and JavaScript in real time. <a href="#" id="github-link">View Source on GitHub</a></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

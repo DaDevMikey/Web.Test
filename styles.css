@@ -6,7 +6,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: linear-gradient(120deg, #4CAF50, #2196F3); /* Blue to Green fade */
+  background: linear-gradient(120deg, #4CAF50, #2196F3);
   color: #333;
   transition: background-color 0.3s;
 }
@@ -20,10 +20,6 @@ header {
   align-items: center;
 }
 
-header h1 {
-  font-size: 1.5em;
-}
-
 button {
   background-color: transparent;
   color: #fff;
@@ -33,27 +29,10 @@ button {
   transition: transform 0.2s;
 }
 
-button:hover {
-  transform: scale(1.1);
-}
-
-button#fullscreen-toggle {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 50%;
-  padding: 0.5em;
-}
-
 /* Dark Mode */
 .dark-mode {
-  background-color: #1C1C1C; /* Dark gray */
+  background-color: #1C1C1C;
   color: #E0E0E0;
-}
-
-.dark-mode header {
-  background-color: #333;
 }
 
 /* Layout */
@@ -66,22 +45,24 @@ main {
 }
 
 #settings {
-  flex: 1 1 200px;
-  max-width: 250px;
+  flex: 1 1 250px;
+  max-width: 300px;
   background: rgba(255, 255, 255, 0.1);
   padding: 1em;
   border-radius: 10px;
   color: #fff;
 }
 
+#settings input[type="color"] {
+  width: 100%;
+  margin-top: 0.5em;
+}
+
+/* Toggle */
 .toggle-label {
   display: flex;
   align-items: center;
   margin-bottom: 0.5em;
-}
-
-.toggle-label input[type="checkbox"] {
-  display: none;
 }
 
 .slider {
@@ -114,22 +95,6 @@ main {
   transform: translateX(20px);
 }
 
-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  margin-top: 0.5em;
-  padding: 0.5em;
-  border-radius: 5px;
-  background-color: #4CAF50;
-  color: white;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
 /* Editor and Preview */
 #editor {
   flex: 3 1 500px;
@@ -151,15 +116,37 @@ textarea {
   border: none;
   padding: 10px;
   font-size: 1em;
-  resize: none;
+  resize: vertical;
 }
 
-#preview {
-  flex: 1 1 100%;
-  background-color: #e3f2fd;
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
+/* Mobile Pop-up */
+#mobile-popup {
+  display: none;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 1em;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 300px;
+  text-align: center;
+  z-index: 10;
+}
+
+#mobile-popup button {
+  margin-top: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.5em 1em;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
 }
 
 /* Mobile Styles */

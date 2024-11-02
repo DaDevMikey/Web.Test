@@ -11,26 +11,43 @@ const showJsCheckbox = document.getElementById('show-js');
 const beautifyButton = document.getElementById('beautify-code');
 const minifyButton = document.getElementById('minify-code');
 const codeSnippets = document.getElementById('code-snippets');
+const saveProgressButton = document.getElementById('save-progress');
+const bgColorInput = document.getElementById('bg-color');
+const textColorInput = document.getElementById('text-color');
+const editorBgColorInput = document.getElementById('editor-bg-color');
+const mobilePopup = document.getElementById('mobile-popup');
+const closePopupButton = document.getElementById('close-popup');
 
-// Update Preview Function
+// Show mobile popup if screen width is less than 768px
+if (window.innerWidth < 768) {
+  mobilePopup.classList.remove('hidden');
+}
+closePopupButton.addEventListener('click', () => {
+  mobilePopup.classList.add('hidden');
+});
+
+// Save Progress Function
+saveProgressButton.addEventListener('click', () => {
+  localStorage.setItem('htmlCode', htmlCode.value);
+  localStorage.setItem('cssCode', cssCode.value);
+  localStorage.setItem('jsCode', jsCode.value);
+  alert('Progress saved locally!');
+});
+
+// Load saved progress on page load
+window.addEventListener('load', () => {
+  htmlCode.value = localStorage.getItem('htmlCode') || '';
+  cssCode.value = localStorage.getItem('cssCode') || '';
+  jsCode.value = localStorage.getItem('jsCode') || '';
+  updatePreview();
+});
+
+// Update Preview
 function updatePreview() {
   const html = htmlCode.value;
   const css = `<style>${cssCode.value}</style>`;
   const js = `<script>${jsCode.value}<\/script>`;
   output.srcdoc = html + css + js;
-}
-
-// Beautify and Minify Functions
-function beautifyCode() {
-  htmlCode.value = html_beautify(htmlCode.value);
-  cssCode.value = css_beautify(cssCode.value);
-  jsCode.value = js_beautify(jsCode.value);
-}
-
-function minifyCode() {
-  htmlCode.value = htmlCode.value.replace(/\s+/g, ' ').trim();
-  cssCode.value = cssCode.value.replace(/\s+/g, ' ').trim();
-  jsCode.value = jsCode.value.replace(/\s+/g, ' ').trim();
 }
 
 // Code Snippets
@@ -51,7 +68,6 @@ const snippets = {
     js: ""
   }
 };
-
 codeSnippets.addEventListener('change', () => {
   const selectedSnippet = snippets[codeSnippets.value];
   if (selectedSnippet) {
@@ -62,6 +78,18 @@ codeSnippets.addEventListener('change', () => {
   }
 });
 
+// Theme Customization
+function applyCustomTheme() {
+  document.body.style.backgroundColor = bgColorInput.value;
+  document.body.style.color = textColorInput.value;
+  document.querySelectorAll('textarea').forEach(area => {
+    area.style.backgroundColor = editorBgColorInput.value;
+  });
+}
+bgColorInput.addEventListener('input', applyCustomTheme);
+textColorInput.addEventListener('input', applyCustomTheme);
+editorBgColorInput.addEventListener('input', applyCustomTheme);
+
 // Theme Toggle
 themeToggle.addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
@@ -69,21 +97,46 @@ themeToggle.addEventListener('click', () => {
     document.body.classList.contains('dark-mode') ? 'dark_mode' : 'light_mode';
 });
 
+// Show/Hide CSS and JS Editors
+showCssCheckbox.addEventListener('change', () => {
+  document.getElementById('css-editor').classList.toggle('hidden', !showCssCheckbox.checked);
+});
+showJsCheckbox.addEventListener('change', () => {
+  document.getElementById('js-editor').classList.toggle('hidden', !showJsCheckbox.checked);
+});
+
 // Fullscreen Mode
 fullscreenToggle.addEventListener('click', () => {
   if (output.requestFullscreen) output.requestFullscreen();
 });
 
-// Event Listeners
-htmlCode.addEventListener('input', () => {
-  if (liveUpdateCheckbox.checked) updatePreview();
-});
-cssCode.addEventListener('input', () => {
-  if (liveUpdateCheckbox.checked) updatePreview();
-});
-jsCode.addEventListener('input', () => {
-  if (liveUpdateCheckbox.checked) updatePreview();
+// Code Sharing
+document.getElementById('share-code').addEventListener('click', () => {
+  const shareData = {
+    html: htmlCode.value,
+    css: cssCode.value,
+    js: jsCode.value
+  };
+  const shareURL = `${location.href.split('?')[0]}?data=${encodeURIComponent(btoa(JSON.stringify(shareData)))}`;
+  navigator.clipboard.writeText(shareURL).then(() => {
+    alert('Shareable link copied to clipboard!');
+  });
 });
 
-// Initial Load
+// Load shared code if available
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('data')) {
+  const sharedData = JSON.parse(atob(decodeURIComponent(urlParams.get('data'))));
+  htmlCode.value = sharedData.html || '';
+  cssCode.value = sharedData.css || '';
+  jsCode.value = sharedData.js || '';
+  updatePreview();
+}
+
+// Live update preview
+htmlCode.addEventListener('input', () => { if (liveUpdateCheckbox.checked) updatePreview(); });
+cssCode.addEventListener('input', () => { if (liveUpdateCheckbox.checked) updatePreview(); });
+jsCode.addEventListener('input', () => { if (liveUpdateCheckbox.checked) updatePreview(); });
+
+// Initial load
 updatePreview();

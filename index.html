@@ -4,23 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>web.test - Code Tester</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
     <h1>web.test - Code Tester</h1>
-    <button id="theme-toggle">Toggle Dark/Light</button>
-    <button id="fullscreen-toggle">Fullscreen Preview</button>
+    <button id="theme-toggle" title="Toggle Dark/Light Mode">
+      <span class="material-icons">brightness_4</span>
+    </button>
+    <button id="fullscreen-toggle" title="Fullscreen Preview">
+      <span class="material-icons">fullscreen</span>
+    </button>
   </header>
 
   <main>
     <aside id="settings">
       <h2>Settings</h2>
-      <label><input type="checkbox" id="live-update" checked> Live Update</label>
-      <label><input type="checkbox" id="show-css" checked> Show CSS Editor</label>
-      <label><input type="checkbox" id="show-js" checked> Show JS Editor</label>
-      <button id="beautify-code">Beautify Code</button>
-      <button id="minify-code">Minify Code</button>
+      <label class="toggle-label">
+        <span>Live Update</span>
+        <input type="checkbox" id="live-update" checked>
+        <span class="slider"></span>
+      </label>
+      <label class="toggle-label">
+        <span>Show CSS Editor</span>
+        <input type="checkbox" id="show-css" checked>
+        <span class="slider"></span>
+      </label>
+      <label class="toggle-label">
+        <span>Show JS Editor</span>
+        <input type="checkbox" id="show-js" checked>
+        <span class="slider"></span>
+      </label>
+      <button id="beautify-code"><span class="material-icons">format_align_center</span> Beautify Code</button>
+      <button id="minify-code"><span class="material-icons">compress</span> Minify Code</button>
     </aside>
 
     <section id="editor">
@@ -39,12 +56,12 @@
     </section>
 
     <section id="preview">
-      <iframe id="output"></iframe>
+      <iframe id="output" title="Output Preview"></iframe>
     </section>
   </main>
 
   <footer>
-    <p>This site lets you test HTML, CSS, and JavaScript in real time. <a href="#" id="github-link">View Source on GitHub</a></p>
+    <p>This site lets you test HTML, CSS, and JavaScript in real-time. <a href="#" id="github-link">View Source on GitHub</a></p>
   </footer>
 
   <script src="script.js"></script>

@@ -6,13 +6,13 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f8f9fa;
+  background: linear-gradient(120deg, #4CAF50, #2196F3); /* Blue to Green fade */
   color: #333;
   transition: background-color 0.3s;
 }
 
 header {
-  background-color: #4CAF50; /* Green accent */
+  background-color: rgba(255, 255, 255, 0.1);
   color: #fff;
   padding: 1em;
   display: flex;
@@ -21,7 +21,7 @@ header {
 }
 
 header h1 {
-  font-size: 1.2em;
+  font-size: 1.5em;
 }
 
 button {
@@ -37,9 +37,18 @@ button:hover {
   transform: scale(1.1);
 }
 
+button#fullscreen-toggle {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  padding: 0.5em;
+}
+
 /* Dark Mode */
 .dark-mode {
-  background-color: #1E1E1E;
+  background-color: #1C1C1C; /* Dark gray */
   color: #E0E0E0;
 }
 
@@ -51,22 +60,18 @@ button:hover {
 main {
   display: flex;
   flex-wrap: wrap;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 120px);
   gap: 10px;
   padding: 1em;
 }
 
-/* Settings Panel */
 #settings {
   flex: 1 1 200px;
   max-width: 250px;
-  background: #f0f8ff; /* Light blue accent */
+  background: rgba(255, 255, 255, 0.1);
   padding: 1em;
   border-radius: 10px;
-}
-
-h2 {
-  color: #4CAF50;
+  color: #fff;
 }
 
 .toggle-label {
@@ -154,6 +159,7 @@ textarea {
   background-color: #e3f2fd;
   border-radius: 10px;
   overflow: hidden;
+  position: relative;
 }
 
 /* Mobile Styles */

@@ -15,7 +15,7 @@ const minifyButton = document.getElementById('minify-code');
 function updatePreview() {
   const html = htmlCode.value;
   const css = `<style>${cssCode.value}</style>`;
-  const js = `<script>${jsCode.value}</script>`;
+  const js = `<script>${jsCode.value}<\/script>`;
   output.srcdoc = html + css + js;
 }
 
@@ -59,6 +59,8 @@ jsCode.addEventListener('input', () => {
 // Theme Toggle
 themeToggle.addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
+  themeToggle.querySelector('.material-icons').textContent = 
+    document.body.classList.contains('dark-mode') ? 'brightness_7' : 'brightness_4';
 });
 
 // Fullscreen Mode

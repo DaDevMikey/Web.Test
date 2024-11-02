@@ -11,10 +11,7 @@
   <header>
     <h1>web.test - Code Tester</h1>
     <button id="theme-toggle" title="Toggle Dark/Light Mode">
-      <span class="material-icons">brightness_4</span>
-    </button>
-    <button id="fullscreen-toggle" title="Fullscreen Preview">
-      <span class="material-icons">fullscreen</span>
+      <span class="material-icons">light_mode</span>
     </button>
   </header>
 
@@ -38,6 +35,13 @@
       </label>
       <button id="beautify-code"><span class="material-icons">format_align_center</span> Beautify Code</button>
       <button id="minify-code"><span class="material-icons">compress</span> Minify Code</button>
+      <h3>Code Snippets</h3>
+      <select id="code-snippets">
+        <option value="">Select a snippet...</option>
+        <option value="hello">Hello World</option>
+        <option value="form">Simple Form</option>
+        <option value="table">Basic Table</option>
+      </select>
     </aside>
 
     <section id="editor">
@@ -57,11 +61,14 @@
 
     <section id="preview">
       <iframe id="output" title="Output Preview"></iframe>
+      <button id="fullscreen-toggle" title="Fullscreen Preview">
+        <span class="material-icons">fullscreen</span>
+      </button>
     </section>
   </main>
 
   <footer>
-    <p>This site lets you test HTML, CSS, and JavaScript in real-time. <a href="#" id="github-link">View Source on GitHub</a></p>
+    <p>This site lets you test HTML, CSS, and JavaScript in real-time. <a href="https://github.com/155601-Mikey/Web.Test" target="_blank">View Source on GitHub</a></p>
   </footer>
 
   <script src="script.js"></script>

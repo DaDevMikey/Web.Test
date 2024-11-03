@@ -3,82 +3,65 @@ const htmlCode = document.getElementById('html-code');
 const cssCode = document.getElementById('css-code');
 const jsCode = document.getElementById('js-code');
 const output = document.getElementById('output');
-const themeToggle = document.getElementById('theme-toggle');
-const fullscreenToggle = document.getElementById('fullscreen-toggle');
-const liveUpdateCheckbox = document.getElementById('live-update');
-const showCssCheckbox = document.getElementById('show-css');
-const showJsCheckbox = document.getElementById('show-js');
-const beautifyButton = document.getElementById('beautify-code');
-const minifyButton = document.getElementById('minify-code');
-const codeSnippets = document.getElementById('code-snippets');
-const saveProgressButton = document.getElementById('save-progress');
+const consoleOutput = document.getElementById('console-output');
+const fontUrlInput = document.getElementById('font-url');
+const frameworkUrlInput = document.getElementById('framework-url');
 const bgColorInput = document.getElementById('bg-color');
 const textColorInput = document.getElementById('text-color');
 const editorBgColorInput = document.getElementById('editor-bg-color');
 const mobilePopup = document.getElementById('mobile-popup');
-const closePopupButton = document.getElementById('close-popup');
+const continueBtn = document.getElementById('continue-btn');
 
-// Show mobile popup if screen width is less than 768px
+// Show mobile popup for small screens
 if (window.innerWidth < 768) {
   mobilePopup.classList.remove('hidden');
 }
-closePopupButton.addEventListener('click', () => {
+continueBtn.addEventListener('click', () => {
   mobilePopup.classList.add('hidden');
 });
 
-// Save Progress Function
-saveProgressButton.addEventListener('click', () => {
-  localStorage.setItem('htmlCode', htmlCode.value);
-  localStorage.setItem('cssCode', cssCode.value);
-  localStorage.setItem('jsCode', jsCode.value);
-  alert('Progress saved locally!');
+// Custom Fonts and Frameworks
+fontUrlInput.addEventListener('input', () => {
+  const linkTag = `<link href="${fontUrlInput.value}" rel="stylesheet">`;
+  document.head.insertAdjacentHTML('beforeend', linkTag);
 });
 
-// Load saved progress on page load
-window.addEventListener('load', () => {
-  htmlCode.value = localStorage.getItem('htmlCode') || '';
-  cssCode.value = localStorage.getItem('cssCode') || '';
-  jsCode.value = localStorage.getItem('jsCode') || '';
-  updatePreview();
+frameworkUrlInput.addEventListener('input', () => {
+  const linkTag = `<link href="${frameworkUrlInput.value}" rel="stylesheet">`;
+  document.head.insertAdjacentHTML('beforeend', linkTag);
 });
 
-// Update Preview
-function updatePreview() {
-  const html = htmlCode.value;
-  const css = `<style>${cssCode.value}</style>`;
-  const js = `<script>${jsCode.value}<\/script>`;
-  output.srcdoc = html + css + js;
+// Code Linting
+function lintCode() {
+  const htmlErrors = htmlCode.value.match(/<[^>]*$/);
+  const cssErrors = cssCode.value.match(/[^{}]*{[^}]*$/);
+  const jsErrors = jsCode.value.match(/function\s+[^\(]*\($/);
+  if (htmlErrors) alert("HTML linting error: Incomplete tag found.");
+  if (cssErrors) alert("CSS linting error: Unclosed bracket found.");
+  if (jsErrors) alert("JavaScript linting error: Function syntax may be incomplete.");
+}
+document.getElementById('lint-code').addEventListener('click', lintCode);
+
+// JavaScript Console
+function updateConsole(message) {
+  consoleOutput.innerHTML += `<div>${message}</div>`;
+  consoleOutput.scrollTop = consoleOutput.scrollHeight;
 }
 
-// Code Snippets
-const snippets = {
-  hello: {
-    html: "<h1>Hello World</h1>",
-    css: "h1 { color: green; }",
-    js: "console.log('Hello World');"
-  },
-  form: {
-    html: "<form><input type='text' placeholder='Your Name'></form>",
-    css: "input { border: 1px solid #ccc; padding: 5px; }",
-    js: ""
-  },
-  table: {
-    html: "<table><tr><td>Item</td><td>Price</td></tr></table>",
-    css: "table { width: 100%; } td { padding: 8px; }",
-    js: ""
+function runJavaScript(jsCode) {
+  const oldLog = console.log;
+  console.log = (msg) => {
+    updateConsole(msg);
+    oldLog(msg);
+  };
+  try {
+    new Function(jsCode)();
+  } catch (error) {
+    updateConsole(`Error: ${error.message}`);
   }
-};
-codeSnippets.addEventListener('change', () => {
-  const selectedSnippet = snippets[codeSnippets.value];
-  if (selectedSnippet) {
-    htmlCode.value = selectedSnippet.html;
-    cssCode.value = selectedSnippet.css;
-    jsCode.value = selectedSnippet.js;
-    updatePreview();
-  }
-});
+}
 
-// Theme Customization
+// Custom Theme
 function applyCustomTheme() {
   document.body.style.backgroundColor = bgColorInput.value;
   document.body.style.color = textColorInput.value;
@@ -90,53 +73,57 @@ bgColorInput.addEventListener('input', applyCustomTheme);
 textColorInput.addEventListener('input', applyCustomTheme);
 editorBgColorInput.addEventListener('input', applyCustomTheme);
 
-// Theme Toggle
-themeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-  themeToggle.querySelector('.material-icons').textContent = 
-    document.body.classList.contains('dark-mode') ? 'dark_mode' : 'light_mode';
-});
-
-// Show/Hide CSS and JS Editors
-showCssCheckbox.addEventListener('change', () => {
-  document.getElementById('css-editor').classList.toggle('hidden', !showCssCheckbox.checked);
-});
-showJsCheckbox.addEventListener('change', () => {
-  document.getElementById('js-editor').classList.toggle('hidden', !showJsCheckbox.checked);
-});
-
-// Fullscreen Mode
-fullscreenToggle.addEventListener('click', () => {
-  if (output.requestFullscreen) output.requestFullscreen();
-});
-
-// Code Sharing
-document.getElementById('share-code').addEventListener('click', () => {
-  const shareData = {
-    html: htmlCode.value,
-    css: cssCode.value,
-    js: jsCode.value
-  };
-  const shareURL = `${location.href.split('?')[0]}?data=${encodeURIComponent(btoa(JSON.stringify(shareData)))}`;
-  navigator.clipboard.writeText(shareURL).then(() => {
-    alert('Shareable link copied to clipboard!');
-  });
-});
-
-// Load shared code if available
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('data')) {
-  const sharedData = JSON.parse(atob(decodeURIComponent(urlParams.get('data'))));
-  htmlCode.value = sharedData.html || '';
-  cssCode.value = sharedData.css || '';
-  jsCode.value = sharedData.js || '';
+// Code Formatting
+function formatCode(code) {
+  return code.replace(/\s+/g, ' ').trim();
+}
+document.getElementById('run-code').addEventListener('click', () => {
+  htmlCode.value = formatCode(htmlCode.value);
+  cssCode.value = formatCode(cssCode.value);
+  jsCode.value = formatCode(jsCode.value);
   updatePreview();
+  runJavaScript(jsCode.value);
+});
+
+// P2P Collaboration with WebRTC
+const peerConnection = new RTCPeerConnection();
+peerConnection.ondatachannel = (event) => {
+  const receiveChannel = event.channel;
+  receiveChannel.onmessage = (msg) => {
+    const data = JSON.parse(msg.data);
+    htmlCode.value = data.html;
+    cssCode.value = data.css;
+    jsCode.value = data.js;
+    updatePreview();
+  };
+};
+
+document.getElementById('start-p2p').addEventListener('click', async () => {
+  const dataChannel = peerConnection.createDataChannel("codeShare");
+  dataChannel.onopen = () => console.log("Data Channel Opened");
+  dataChannel.onmessage = (msg) => {
+    const data = JSON.parse(msg.data);
+    htmlCode.value = data.html;
+    cssCode.value = data.css;
+    jsCode.value = data.js;
+    updatePreview();
+  };
+  const offer = await peerConnection.createOffer();
+  await peerConnection.setLocalDescription(offer);
+  console.log(`Offer created: ${JSON.stringify(offer)}`);
+});
+
+// Update Preview
+function updatePreview() {
+  const html = htmlCode.value;
+  const css = `<style>${cssCode.value}</style>`;
+  const js = `<script>${jsCode.value}</script>`;
+  output.srcdoc = html + css + js;
 }
 
-// Live update preview
-htmlCode.addEventListener('input', () => { if (liveUpdateCheckbox.checked) updatePreview(); });
-cssCode.addEventListener('input', () => { if (liveUpdateCheckbox.checked) updatePreview(); });
-jsCode.addEventListener('input', () => { if (liveUpdateCheckbox.checked) updatePreview(); });
-
-// Initial load
-updatePreview();
+// Offline Mode (Service Worker)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(() => {
+    console.log('Service Worker Registered for Offline Mode');
+  });
+}

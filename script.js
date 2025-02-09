@@ -1,129 +1,149 @@
-// Elements
-const htmlCode = document.getElementById('html-code');
-const cssCode = document.getElementById('css-code');
-const jsCode = document.getElementById('js-code');
-const output = document.getElementById('output');
-const consoleOutput = document.getElementById('console-output');
-const fontUrlInput = document.getElementById('font-url');
-const frameworkUrlInput = document.getElementById('framework-url');
-const bgColorInput = document.getElementById('bg-color');
-const textColorInput = document.getElementById('text-color');
-const editorBgColorInput = document.getElementById('editor-bg-color');
-const mobilePopup = document.getElementById('mobile-popup');
-const continueBtn = document.getElementById('continue-btn');
+let htmlEditor, cssEditor, jsEditor;
+const consoleDiv = document.getElementById('console-output');
+let originalConsole = {
+  log: console.log,
+  error: console.error,
+  warn: console.warn
+};
 
-// Show mobile popup for small screens
-if (window.innerWidth < 768) {
-  mobilePopup.classList.remove('hidden');
-}
-continueBtn.addEventListener('click', () => {
-  mobilePopup.classList.add('hidden');
+// Initialize CodeMirror editors
+document.addEventListener('DOMContentLoaded', () => {
+  // Setup HTML editor
+  htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-editor'), {
+    mode: 'xml',
+    theme: 'monokai',
+    lineNumbers: true,
+    autoCloseTags: true,
+    lineWrapping: true
+  });
+
+  // Setup CSS editor
+  cssEditor = CodeMirror.fromTextArea(document.getElementById('css-editor'), {
+    mode: 'css',
+    theme: 'monokai',
+    lineNumbers: true,
+    lineWrapping: true
+  });
+
+  // Setup JavaScript editor
+  jsEditor = CodeMirror.fromTextArea(document.getElementById('js-editor'), {
+    mode: 'javascript',
+    theme: 'monokai',
+    lineNumbers: true,
+    lineWrapping: true
+  });
+
+  // Initial preview update
+  updatePreview();
 });
 
-// Custom Fonts and Frameworks
-fontUrlInput.addEventListener('input', () => {
-  const linkTag = `<link href="${fontUrlInput.value}" rel="stylesheet">`;
-  document.head.insertAdjacentHTML('beforeend', linkTag);
-});
+// Update preview when "Run" is clicked
+function updatePreview() {
+  const iframe = document.getElementById('preview-frame');
+  const html = htmlEditor.getValue();
+  const css = cssEditor.getValue();
+  const js = jsEditor.getValue();
 
-frameworkUrlInput.addEventListener('input', () => {
-  const linkTag = `<link href="${frameworkUrlInput.value}" rel="stylesheet">`;
-  document.head.insertAdjacentHTML('beforeend', linkTag);
-});
+  // Reset console
+  clearConsole();
 
-// Code Linting
-function lintCode() {
-  const htmlErrors = htmlCode.value.match(/<[^>]*$/);
-  const cssErrors = cssCode.value.match(/[^{}]*{[^}]*$/);
-  const jsErrors = jsCode.value.match(/function\s+[^\(]*\($/);
-  if (htmlErrors) alert("HTML linting error: Incomplete tag found.");
-  if (cssErrors) alert("CSS linting error: Unclosed bracket found.");
-  if (jsErrors) alert("JavaScript linting error: Function syntax may be incomplete.");
+  // Create new document content
+  const content = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>${css}</style>
+      </head>
+      <body>
+        ${html}
+        <script>
+          // Override console methods
+          console.log = function() {
+            window.parent.postMessage({
+              type: 'console',
+              method: 'log',
+              args: Array.from(arguments)
+            }, '*');
+            return originalConsole.log.apply(console, arguments);
+          };
+          
+          console.error = function() {
+            window.parent.postMessage({
+              type: 'console',
+              method: 'error',
+              args: Array.from(arguments)
+            }, '*');
+            return originalConsole.error.apply(console, arguments);
+          };
+          
+          console.warn = function() {
+            window.parent.postMessage({
+              type: 'console',
+              method: 'warn',
+              args: Array.from(arguments)
+            }, '*');
+            return originalConsole.warn.apply(console, arguments);
+          };
+
+          // Wrap user code in try-catch
+          try {
+            ${js}
+          } catch(err) {
+            console.error(err);
+          }
+        </script>
+      </body>
+    </html>
+  `;
+
+  // Update iframe content
+  iframe.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(content);
 }
-document.getElementById('lint-code').addEventListener('click', lintCode);
 
-// JavaScript Console
-function updateConsole(message) {
-  consoleOutput.innerHTML += `<div>${message}</div>`;
-  consoleOutput.scrollTop = consoleOutput.scrollHeight;
-}
-
-function runJavaScript(jsCode) {
-  const oldLog = console.log;
-  console.log = (msg) => {
-    updateConsole(msg);
-    oldLog(msg);
-  };
-  try {
-    new Function(jsCode)();
-  } catch (error) {
-    updateConsole(`Error: ${error.message}`);
+// Clear specific editor
+function clearEditor(type) {
+  switch(type) {
+    case 'html':
+      htmlEditor.setValue('');
+      break;
+    case 'css':
+      cssEditor.setValue('');
+      break;
+    case 'js':
+      jsEditor.setValue('');
+      break;
   }
 }
 
-// Custom Theme
-function applyCustomTheme() {
-  document.body.style.backgroundColor = bgColorInput.value;
-  document.body.style.color = textColorInput.value;
-  document.querySelectorAll('textarea').forEach(area => {
-    area.style.backgroundColor = editorBgColorInput.value;
-  });
+// Clear console output
+function clearConsole() {
+  consoleDiv.innerHTML = '';
 }
-bgColorInput.addEventListener('input', applyCustomTheme);
-textColorInput.addEventListener('input', applyCustomTheme);
-editorBgColorInput.addEventListener('input', applyCustomTheme);
 
-// Code Formatting
-function formatCode(code) {
-  return code.replace(/\s+/g, ' ').trim();
-}
-document.getElementById('run-code').addEventListener('click', () => {
-  htmlCode.value = formatCode(htmlCode.value);
-  cssCode.value = formatCode(cssCode.value);
-  jsCode.value = formatCode(jsCode.value);
-  updatePreview();
-  runJavaScript(jsCode.value);
+// Handle console messages from iframe
+window.addEventListener('message', function(event) {
+  if (event.data.type === 'console') {
+    const message = document.createElement('div');
+    message.className = `console-message console-${event.data.method}`;
+    
+    const args = event.data.args.map(arg => {
+      if (typeof arg === 'object') {
+        return JSON.stringify(arg, null, 2);
+      }
+      return arg;
+    }).join(' ');
+    
+    message.textContent = args;
+    consoleDiv.appendChild(message);
+    consoleDiv.scrollTop = consoleDiv.scrollHeight;
+  }
 });
 
-// P2P Collaboration with WebRTC
-const peerConnection = new RTCPeerConnection();
-peerConnection.ondatachannel = (event) => {
-  const receiveChannel = event.channel;
-  receiveChannel.onmessage = (msg) => {
-    const data = JSON.parse(msg.data);
-    htmlCode.value = data.html;
-    cssCode.value = data.css;
-    jsCode.value = data.js;
-    updatePreview();
-  };
+// Handle errors in the main window
+window.onerror = function(message, source, lineno, colno, error) {
+  const errorMessage = document.createElement('div');
+  errorMessage.className = 'console-message console-error';
+  errorMessage.textContent = `${message} (${source}:${lineno}:${colno})`;
+  consoleDiv.appendChild(errorMessage);
+  consoleDiv.scrollTop = consoleDiv.scrollHeight;
 };
-
-document.getElementById('start-p2p').addEventListener('click', async () => {
-  const dataChannel = peerConnection.createDataChannel("codeShare");
-  dataChannel.onopen = () => console.log("Data Channel Opened");
-  dataChannel.onmessage = (msg) => {
-    const data = JSON.parse(msg.data);
-    htmlCode.value = data.html;
-    cssCode.value = data.css;
-    jsCode.value = data.js;
-    updatePreview();
-  };
-  const offer = await peerConnection.createOffer();
-  await peerConnection.setLocalDescription(offer);
-  console.log(`Offer created: ${JSON.stringify(offer)}`);
-});
-
-// Update Preview
-function updatePreview() {
-  const html = htmlCode.value;
-  const css = `<style>${cssCode.value}</style>`;
-  const js = `<script>${jsCode.value}</script>`;
-  output.srcdoc = html + css + js;
-}
-
-// Offline Mode (Service Worker)
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').then(() => {
-    console.log('Service Worker Registered for Offline Mode');
-  });
-}

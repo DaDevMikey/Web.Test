@@ -1,84 +1,58 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>web.test - Code Tester</title>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <title>Web Code Editor & Debugger</title>
+  <link href="style.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>web.test - Code Tester</h1>
-    <button id="theme-toggle" title="Toggle Dark/Light Mode">
-      <span class="material-icons">light_mode</span>
-    </button>
-  </header>
+  <div class="container">
+    <div class="editors">
+      <div class="editor-container">
+        <div class="editor-header">
+          <h3>HTML</h3>
+          <button onclick="clearEditor('html')">Clear</button>
+        </div>
+        <textarea id="html-editor"></textarea>
+      </div>
+      <div class="editor-container">
+        <div class="editor-header">
+          <h3>CSS</h3>
+          <button onclick="clearEditor('css')">Clear</button>
+        </div>
+        <textarea id="css-editor"></textarea>
+      </div>
+      <div class="editor-container">
+        <div class="editor-header">
+          <h3>JavaScript</h3>
+          <button onclick="clearEditor('js')">Clear</button>
+        </div>
+        <textarea id="js-editor"></textarea>
+      </div>
+    </div>
+    
+    <div class="preview-container">
+      <div class="preview-header">
+        <h3>Preview</h3>
+        <button onclick="updatePreview()">Run</button>
+      </div>
+      <iframe id="preview-frame"></iframe>
+    </div>
 
-  <!-- Mobile Device Pop-up -->
-  <div id="mobile-popup" class="hidden">
-    <p>This site is optimized for larger screens. Some features may not be fully accessible on smaller devices.</p>
-    <button id="continue-btn">Continue Anyway</button>
-  </div>
-
-  <main>
-    <aside id="settings">
-      <h2>Settings</h2>
-      
-      <!-- Console Area -->
-      <h3>Console Output</h3>
+    <div class="console-container">
+      <div class="console-header">
+        <h3>Console</h3>
+        <button onclick="clearConsole()">Clear</button>
+      </div>
       <div id="console-output"></div>
-
-      <!-- Font and Frameworks -->
-      <h3>Custom Fonts & CSS Frameworks</h3>
-      <input type="url" id="font-url" placeholder="Enter font URL (e.g., Google Fonts)">
-      <input type="url" id="framework-url" placeholder="Enter CSS framework URL (e.g., Bootstrap)">
-      
-      <!-- Code Split View and Search -->
-      <h3>Editor Options</h3>
-      <button id="split-view-toggle"><span class="material-icons">view_column</span> Toggle Split View</button>
-      <input type="text" id="search-input" placeholder="Search in code...">
-      
-      <!-- Code Linting -->
-      <h3>Code Linting</h3>
-      <button id="lint-code"><span class="material-icons">fact_check</span> Lint Code</button>
-
-      <!-- Peer-to-Peer Collaboration -->
-      <h3>Collaboration</h3>
-      <button id="start-p2p"><span class="material-icons">people</span> Start Collaboration</button>
-    </aside>
-
-    <section id="editor">
-      <div class="editor-section" id="html-editor">
-        <label for="html-code"><span class="material-icons">code</span> HTML</label>
-        <textarea id="html-code" spellcheck="false"></textarea>
-      </div>
-      <div class="editor-section hidden" id="css-editor">
-        <label for="css-code"><span class="material-icons">brush</span> CSS</label>
-        <textarea id="css-code" spellcheck="false"></textarea>
-      </div>
-      <div class="editor-section hidden" id="js-editor">
-        <label for="js-code"><span class="material-icons">javascript</span> JavaScript</label>
-        <textarea id="js-code" spellcheck="false"></textarea>
-      </div>
-    </section>
-
-    <section id="preview">
-      <iframe id="output" title="Output Preview"></iframe>
-      <button id="fullscreen-toggle" title="Fullscreen Preview">
-        <span class="material-icons">fullscreen</span>
-      </button>
-    </section>
-  </main>
-
-  <footer>
-    <p>This site lets you test HTML, CSS, and JavaScript in real-time. <a href="https://github.com/155601-Mikey/Web.Test" target="_blank">View Source on GitHub</a></p>
-    <h3>Custom Theme</h3>
-    <input type="color" id="bg-color" title="Background Color">
-    <input type="color" id="text-color" title="Text Color">
-    <input type="color" id="editor-bg-color" title="Editor Background Color">
-  </footer>
-
+    </div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
